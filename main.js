@@ -1,10 +1,7 @@
-// import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.module.js';
-// import { VRButton } from 'https://cdn.jsdelivr.net/npm/three@0.159.0/examples/jsm/webxr/VRButton.js';
-// import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-// import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
 import { VRButton } from 'three/addons/webxr/VRButton.js';
 
 const scene = new THREE.Scene();
@@ -12,7 +9,6 @@ scene.background = new THREE.Color(0xaaaaaa);
 
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
 camera.position.set(4, 2.5, -1)
-// camera.position.set(0, 4.5, 0)
 camera.lookAt(0, 0, 0)
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -42,7 +38,7 @@ const loader = new GLTFLoader()
 let mixer
 let animations
 loader.load('molino.glb', (gltf) => {
-    scene.add(gltf.scene);
+    // scene.add(gltf.scene);
     rueda1 = gltf.scene.getObjectByName('rueda1')
     rueda2 = gltf.scene.getObjectByName('rueda2')
     
