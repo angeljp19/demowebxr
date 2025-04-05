@@ -132,6 +132,8 @@ function animate() {
 window.addEventListener('resize', function() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+    camera.position.set(4, 2.5, -1);
+    camera.lookAt(0, 0, 0);
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
