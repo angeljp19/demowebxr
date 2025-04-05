@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { VRButton } from 'three/addons/webxr/VRButton.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xaaaaaa);
@@ -22,6 +23,10 @@ renderer.physicallyCorrectLights = true;
 document.body.appendChild(renderer.domElement);
 document.body.appendChild(VRButton.createButton(renderer));
 
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.25;
+
 // Piso
 const floor = new THREE.Mesh(
   new THREE.PlaneGeometry(10, 10),
@@ -32,21 +37,47 @@ floor.position.y = -2;
 floor.receiveShadow = true;
 scene.add(floor);
 
-// Luces mejoradas
-const light = new THREE.HemisphereLight(0xffffff, 0x444444, 2.0);
-scene.add(light);
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
-scene.add(ambientLight);
-
-const directionalLight = new THREE.DirectionalLight(0xffffff, 3.0);
-directionalLight.position.set(5, 10, 7);
-directionalLight.castShadow = true;
+const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
+directionalLight.position.set(0, 10, 0); 
+directionalLight.lookAt(0,0,0)
 scene.add(directionalLight);
 
-const fillLight = new THREE.PointLight(0xffffff, 1);
-fillLight.position.set(-5, 5, 5);
-scene.add(fillLight);
+
+const dirLightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
+// scene.add(dirLightHelper);
+
+const directionalLight2 = new THREE.DirectionalLight(0xffffff, 5); 
+directionalLight2.position.set(10, 0, 0); 
+directionalLight2.lookAt(0,0,0)
+scene.add(directionalLight2);
+
+const dirLightHelper2 = new THREE.DirectionalLightHelper(directionalLight2, 5);
+// scene.add(dirLightHelper2);
+
+const directionalLight3 = new THREE.DirectionalLight(0xffffff, 5); 
+directionalLight3.position.set(-10, 0, 0); 
+directionalLight3.lookAt(0,0,0)
+scene.add(directionalLight3);
+
+const dirLightHelper3 = new THREE.DirectionalLightHelper(directionalLight3, 5);
+// scene.add(dirLightHelper3);
+
+const directionalLight4 = new THREE.DirectionalLight(0xffffff, 5); 
+directionalLight4.position.set(0, 0, -10); 
+directionalLight4.lookAt(0,0,0)
+scene.add(directionalLight4);
+
+const dirLightHelper4 = new THREE.DirectionalLightHelper(directionalLight4, 5);
+// scene.add(dirLightHelper4);
+
+const directionalLight5 = new THREE.DirectionalLight(0xffffff, 5); 
+directionalLight5.position.set(0, 0, 10); 
+directionalLight5.lookAt(0,0,0)
+scene.add(directionalLight5);
+
+const dirLightHelper5 = new THREE.DirectionalLightHelper(directionalLight5, 5);
+// scene.add(dirLightHelper5);
 
 let rueda1, rueda2;
 const loader = new GLTFLoader();
