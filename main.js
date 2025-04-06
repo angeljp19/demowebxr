@@ -7,7 +7,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xaaaaaa);
 
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 1000);
-camera.position.set(4, 2.5, -1);
+camera.position.set(0, 3, 0);
 camera.lookAt(0, 0, 0);
 
 const renderer = new THREE.WebGLRenderer({ 
@@ -23,9 +23,9 @@ renderer.physicallyCorrectLights = true;
 document.body.appendChild(renderer.domElement);
 document.body.appendChild(VRButton.createButton(renderer));
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.25;
+// const controls = new OrbitControls(camera, renderer.domElement);
+// controls.enableDamping = true;
+// controls.dampingFactor = 0.25;
 
 // Piso
 const floor = new THREE.Mesh(
@@ -35,7 +35,7 @@ const floor = new THREE.Mesh(
 floor.rotation.x = -Math.PI / 2;
 floor.position.y = -2;
 floor.receiveShadow = true;
-scene.add(floor);
+// scene.add(floor);
 
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
@@ -98,6 +98,8 @@ loader.load('molino.glb', (gltf) => {
     });
     
     scene.add(gltf.scene);
+    gltf.scene.position.set(3, -1, 0);
+  
     rueda1 = gltf.scene.getObjectByName('rueda1');
     rueda2 = gltf.scene.getObjectByName('rueda2');
     
@@ -108,6 +110,42 @@ loader.load('molino.glb', (gltf) => {
         const action = mixer.clipAction(clip);
         action.setLoop(THREE.LoopRepeat, Infinity);
         action.play();
+
+    });
+});
+
+let rueda1Copy, rueda2Copy;
+let mixer2;
+let animations2;
+
+loader.load('molino.glb', (gltf) => {
+    gltf.scene.traverse(function(child) {
+        if (child.isMesh) {
+            if (!(child.material instanceof THREE.MeshStandardMaterial)) {
+                child.material = new THREE.MeshStandardMaterial({
+                    color: child.material.color || 0xffffff,
+                    map: child.material.map
+                });
+            }
+            child.material.needsUpdate = true;
+        }
+    });
+    
+    scene.add(gltf.scene);
+    gltf.scene.position.set(-3, 0, 0);
+    gltf.scene.rotation.z = -1.5
+  
+    rueda1Copy = gltf.scene.getObjectByName('rueda1');
+    rueda2Copy = gltf.scene.getObjectByName('rueda2');
+    
+    mixer2 = new THREE.AnimationMixer(gltf.scene);
+    animations2 = gltf.animations;
+
+    animations2.forEach((clip) => {
+        const action = mixer2.clipAction(clip);
+        action.setLoop(THREE.LoopRepeat, Infinity);
+        action.play();
+
     });
 });
 
@@ -117,6 +155,12 @@ function rotateWheel() {
         rueda2.rotation.x -= 0.03;
     }
 }
+function rotateWheel2() {
+    if (rueda1Copy && rueda2Copy) {
+        rueda1Copy.rotation.x -= 0.03;
+        rueda2Copy.rotation.x -= 0.03;
+    }
+}
 
 const clock = new THREE.Clock(); 
 
@@ -124,7 +168,9 @@ function animate() {
     renderer.setAnimationLoop(function() {
         const deltaTime = clock.getDelta();
         if (mixer) mixer.update(deltaTime);
+        if (mixer2) mixer2.update(deltaTime);
         rotateWheel();
+        rotateWheel2();
         renderer.render(scene, camera);
     });
 }
@@ -132,8 +178,6 @@ function animate() {
 window.addEventListener('resize', function() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    camera.position.set(4, 2.5, -1);
-    camera.lookAt(0, 0, 0);
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
