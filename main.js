@@ -3,12 +3,17 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { VRButton } from 'three/addons/webxr/VRButton.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+import {addLights} from './lighting.js';
+import {addMolino1, rotateWheelMolino1, mixerMolino1} from './molino1.js';
+import {addMolino2, rotateWheelMolino2, mixerMolino2} from './molino2.js';
+import {ensamblarMolino, toggleAnimacionMolino, updateMolino, getDirection} from './molinoEnsamble.js';
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xaaaaaa);
 
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 1000);
-camera.position.set(0, 3, 0);
-camera.lookAt(0, 0, 0);
+camera.position.set(0, -1, 2);
+// camera.lookAt(2, 2, 2);
 
 const renderer = new THREE.WebGLRenderer({ 
   antialias: true,
@@ -23,162 +28,47 @@ renderer.physicallyCorrectLights = true;
 document.body.appendChild(renderer.domElement);
 document.body.appendChild(VRButton.createButton(renderer));
 
-// const controls = new OrbitControls(camera, renderer.domElement);
-// controls.enableDamping = true;
-// controls.dampingFactor = 0.25;
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.25;
 
-// Piso
-const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(10, 10),
-  new THREE.MeshStandardMaterial({ color: 0x444444 })
-);
-floor.rotation.x = -Math.PI / 2;
-floor.position.y = -2;
-floor.receiveShadow = true;
-// scene.add(floor);
+addLights(scene);
+addMolino1(scene);
+ensamblarMolino(scene);
 
-
-const directionalLight = new THREE.DirectionalLight(0xffffff, 5);
-directionalLight.position.set(0, 10, 0); 
-directionalLight.lookAt(0,0,0)
-scene.add(directionalLight);
-
-
-const dirLightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
-// scene.add(dirLightHelper);
-
-const directionalLight2 = new THREE.DirectionalLight(0xffffff, 5); 
-directionalLight2.position.set(10, 0, 0); 
-directionalLight2.lookAt(0,0,0)
-scene.add(directionalLight2);
-
-const dirLightHelper2 = new THREE.DirectionalLightHelper(directionalLight2, 5);
-// scene.add(dirLightHelper2);
-
-const directionalLight3 = new THREE.DirectionalLight(0xffffff, 5); 
-directionalLight3.position.set(-10, 0, 0); 
-directionalLight3.lookAt(0,0,0)
-scene.add(directionalLight3);
-
-const dirLightHelper3 = new THREE.DirectionalLightHelper(directionalLight3, 5);
-// scene.add(dirLightHelper3);
-
-const directionalLight4 = new THREE.DirectionalLight(0xffffff, 5); 
-directionalLight4.position.set(0, 0, -10); 
-directionalLight4.lookAt(0,0,0)
-scene.add(directionalLight4);
-
-const dirLightHelper4 = new THREE.DirectionalLightHelper(directionalLight4, 5);
-// scene.add(dirLightHelper4);
-
-const directionalLight5 = new THREE.DirectionalLight(0xffffff, 5); 
-directionalLight5.position.set(0, 0, 10); 
-directionalLight5.lookAt(0,0,0)
-scene.add(directionalLight5);
-
-const dirLightHelper5 = new THREE.DirectionalLightHelper(directionalLight5, 5);
-// scene.add(dirLightHelper5);
-
-let rueda1, rueda2;
-const loader = new GLTFLoader();
-let mixer;
-let animations;
-
-loader.load('molino.glb', (gltf) => {
-    gltf.scene.traverse(function(child) {
-        if (child.isMesh) {
-            if (!(child.material instanceof THREE.MeshStandardMaterial)) {
-                child.material = new THREE.MeshStandardMaterial({
-                    color: child.material.color || 0xffffff,
-                    map: child.material.map
-                });
-            }
-            child.material.needsUpdate = true;
-        }
-    });
-    
-    scene.add(gltf.scene);
-    gltf.scene.position.set(3, -1, 0);
-  
-    rueda1 = gltf.scene.getObjectByName('rueda1');
-    rueda2 = gltf.scene.getObjectByName('rueda2');
-    
-    mixer = new THREE.AnimationMixer(gltf.scene);
-    animations = gltf.animations;
-
-    animations.forEach((clip) => {
-        const action = mixer.clipAction(clip);
-        action.setLoop(THREE.LoopRepeat, Infinity);
-        action.play();
-
-    });
-});
-
-let rueda1Copy, rueda2Copy;
-let mixer2;
-let animations2;
-
-loader.load('molino.glb', (gltf) => {
-    gltf.scene.traverse(function(child) {
-        if (child.isMesh) {
-            if (!(child.material instanceof THREE.MeshStandardMaterial)) {
-                child.material = new THREE.MeshStandardMaterial({
-                    color: child.material.color || 0xffffff,
-                    map: child.material.map
-                });
-            }
-            child.material.needsUpdate = true;
-        }
-    });
-    
-    scene.add(gltf.scene);
-    gltf.scene.position.set(-3, 0, 0);
-    gltf.scene.rotation.z = -1.5
-  
-    rueda1Copy = gltf.scene.getObjectByName('rueda1');
-    rueda2Copy = gltf.scene.getObjectByName('rueda2');
-    
-    mixer2 = new THREE.AnimationMixer(gltf.scene);
-    animations2 = gltf.animations;
-
-    animations2.forEach((clip) => {
-        const action = mixer2.clipAction(clip);
-        action.setLoop(THREE.LoopRepeat, Infinity);
-        action.play();
-
-    });
-});
-
-function rotateWheel() {
-    if (rueda1 && rueda2) {
-        rueda1.rotation.x -= 0.03;
-        rueda2.rotation.x -= 0.03;
-    }
-}
-function rotateWheel2() {
-    if (rueda1Copy && rueda2Copy) {
-        rueda1Copy.rotation.x -= 0.03;
-        rueda2Copy.rotation.x -= 0.03;
-    }
-}
-
+let activeMachine = false
+let activeEnsamble = false
 const clock = new THREE.Clock(); 
-
 function animate() {
     renderer.setAnimationLoop(function() {
         const deltaTime = clock.getDelta();
-        if (mixer) mixer.update(deltaTime);
-        if (mixer2) mixer2.update(deltaTime);
-        rotateWheel();
-        rotateWheel2();
+        mixerMolino1(deltaTime, activeMachine);
+        updateMolino(deltaTime);
+        rotateWheelMolino1(activeMachine)
         renderer.render(scene, camera);
     });
+    
+
 }
+
 
 window.addEventListener('resize', function() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
+document.getElementById('btnActivarMaquina').addEventListener('click', function() {
+    activeMachine = !activeMachine;
+    if (activeMachine) {
+        document.getElementById('btnActivarMaquina').innerText = 'Desactivar Máquina';
+    } else {
+        document.getElementById('btnActivarMaquina').innerText = 'Activar Máquina';
+    }
+})
 
+document.getElementById('btnVerPartes').addEventListener('click', () => {
+    toggleAnimacionMolino()
+    activeEnsamble = !activeEnsamble
+    document.getElementById('btnVerPartes').innerText = getDirection() === -1 ? 'Desarmar' : 'Armar'
+})
 animate();

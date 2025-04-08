@@ -3,10 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <title>WebXR VR Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body { margin: 0; overflow: hidden; }
-    canvas { display: block; }
+    canvas { 
+      display: block;
+      position: absolute;
+      z-index: 0;
+     }
   </style>
   <script type="importmap">
     {
@@ -17,7 +22,20 @@
     }
   </script>
 </head>
-<body>
+<body style="width: 100vw; height: 100vh;">
   <script type="module" src="main.js"></script>
-</body>
+  <script type="module" src="lighting.js"></script>
+  <script type="module" src="molino1.js"></script>
+  <script type="module" src="molino2.js"></script>
+  <script type="module" src="molinoEnsamble.js"></script>
+  <div class="absolute w-full h-full">
+    <div class="flex w-[150px] flex-col space-y-5">
+      <button id="btnActivarMaquina" class="bg-blue-500 text-white px-4 py-2 rounded z-10">
+        Activar Maquina
+      </button>
+      <button id="btnVerPartes" class="bg-blue-500 text-white px-4 py-2 rounded z-10">
+        Desarmar
+      </button>
+    </div>
+  </div>
 </html>
